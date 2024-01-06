@@ -1,0 +1,38 @@
+npm install discord.js
+const Discord = require('discord.js');
+const client = new Discord.Client();
+
+// Bot token (Replace 'YOUR_BOT_TOKEN' with your actual bot token)
+const token = 'YOUR_BOT_TOKEN';
+
+client.on('ready', () => {
+    console.log(Bot logged in as ${client.user.tag});
+});
+
+client.on('message', (message) => {
+    // Check if the author is a bot or the message does not contain any embeds
+    if (message.author.bot || !message.embeds.length) {
+        return;
+    }
+
+    const { embeds } = message;
+    const isModeratorOrAdmin = message.member.roles.cache.some((role) =>
+        ['TRIAL MODERATOR', 'MODERATOR', 'ADVANCED MODERATOR', 'LEAD MODERATOR', 'ADMIN TEAM', 'ARKGAMES STAFF'].includes(role.name)
+    );
+
+    // Loop through all embeds in the message
+    for (const embed of embeds) {
+        // Check if the embed type is 'link' and the link is a discord server link
+        if (embed.type === 'link' && embed.url.includes('discord.gg')) {
+            // If the author is not a moderator or admin
+            if (!isModeratorOrAdmin) {
+                // Delete the message and send a warning
+                message.delete();
+                message.reply('Sorry, you are not allowed to send Discord server links.');
+                break; // No need to check other embeds if one is found
+            }
+        }
+    }
+});
+
+client.login(token);
